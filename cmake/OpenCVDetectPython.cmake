@@ -19,9 +19,9 @@ function(find_python min_version
     numpy_include_dirs numpy_version)
   # Detect Python in PATH first. Available in CMake 3.16+
   if(NOT DEFINED Python3_EXECUTABLE)
-    find_program(Python3_PATH "python")
+    find_program(Python3_PATH "python3")
     if(NOT Python3_PATH)
-      find_program(Python3_PATH "python3")
+      find_program(Python3_PATH "python")
     endif()
     if(Python3_PATH)
       set(Python3_EXECUTABLE "${Python3_PATH}")

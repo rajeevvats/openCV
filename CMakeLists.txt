@@ -760,10 +760,10 @@ if(BUILD_JAVA)
   endif()
 endif()
 
-if(ENABLE_PYLINT AND PYTHON_DEFAULT_AVAILABLE)
+if(ENABLE_PYLINT AND PYTHON3INTERP_FOUND)
   include(cmake/OpenCVPylint.cmake)
 endif()
-if(ENABLE_FLAKE8 AND PYTHON_DEFAULT_AVAILABLE)
+if(ENABLE_FLAKE8 AND PYTHON3INTERP_FOUND)
   find_package(Flake8 QUIET)
   if(NOT FLAKE8_FOUND OR NOT FLAKE8_EXECUTABLE)
     include("${CMAKE_CURRENT_LIST_DIR}/cmake/FindFlake8.cmake")
@@ -1811,9 +1811,6 @@ if(BUILD_opencv_python3)
   status("    numpy:"         PYTHON3_NUMPY_INCLUDE_DIRS THEN "${PYTHON3_NUMPY_INCLUDE_DIRS} (ver ${PYTHON3_NUMPY_VERSION})" ELSE "NO (Python3 wrappers can not be generated)")
   status("    install path:"  HAVE_opencv_python3  THEN "${__INSTALL_PATH_PYTHON3}"                            ELSE "-")
 endif()
-
-status("")
-status("  Python (for build):"  PYTHON_DEFAULT_AVAILABLE THEN "${PYTHON_DEFAULT_EXECUTABLE}" ELSE NO)
 
 # ========================== java ==========================
 if(BUILD_JAVA)

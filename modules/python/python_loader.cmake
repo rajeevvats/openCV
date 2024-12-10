@@ -131,7 +131,7 @@ if(NOT "${OPENCV_PYTHON_EXTRA_MODULES_PATH}" STREQUAL "")
   endforeach()
 endif()
 
-if(NOT TARGET copy_opencv_typing_stubs)
+if(${PYTHON}_VERSION_STRING VERSION_GREATER "3.6")
   add_custom_target(copy_opencv_typing_stubs)
   # Copy all generated stub files to python_loader directory only if
   # generation succeeds, this behavior can't be achieved with default

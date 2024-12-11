@@ -69,6 +69,7 @@ parser.add_argument('--target', choices=targets, default=cv.dnn.DNN_TARGET_CPU, 
                          '%d: NCS2 VPU, '
                          '%d: HDDL VPU, '
                          '%d: CUDA ' % targets)
+parser.add_argument('--mask', '-m', type=str, help='Path to mask image. If not provided, interactive mask creation will be used.', default=None)
 
 def make_batch(image, mask):
     image = image.astype(np.float32)/255.0
@@ -442,6 +443,10 @@ class DDIMInpainter(object):
         else:
             return x_recon
 
+    def inpaint(self, image : np.ndarray, mask : np.ndarray, S : int = 50) -> np.ndarray:
+        inpainted = self(image, mask, S)
+        return np.squeeze(inpainted)
+
     def __call__(self, image : np.ndarray, mask : np.ndarray, S : int = 50) -> np.ndarray:
 
         # Encode the image and mask
@@ -521,22 +526,30 @@ def create_mask(img, radius=20):
     cv.destroyAllWindows()
     return mask
 
+def prepare_input(args):
+    image = cv.imread(args.image)
+    if args.mask:
+        mask = cv.imread(args.mask, cv.IMREAD_GRAYSCALE)
+        if mask is None:
+            raise ValueError(f"Could not read mask file: {args.mask}")
+        if mask.shape[:2] != image.shape[:2]:
+            mask = cv.resize(mask, (image.shape[1], image.shape[0]), interpolation=cv.INTER_NEAREST)
+    else:
+        mask = create_mask(deepcopy(image))
+
+    image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
+    batch = make_batch(image, mask)
+    return batch
 
 def main(args):
 
-    image = cv.imread(args.image)
-    mask = create_mask(deepcopy(image))
-    image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
-
-    batch = make_batch(image, mask)
-    image, mask, masked_image = batch["image"], batch["mask"], batch["masked_image"]
+    batch = prepare_input(args)
 
     model = DDIMInpainter(args)
-    result = model(masked_image, mask, S=args.samples)
-    result = np.squeeze(result)
-    # save the result in the directore of args.image
-    cv.imwrite(args.image.replace(".png", "_inpainted.png"), result[..., ::-1])
+    result = model.inpaint(batch["masked_image"], batch["mask"], S=args.samples)
 
+    ext = args.image.split('.')[-1]
+    cv.imwrite(args.image.replace(f".{ext}", f"_inpainted.{ext}"), result[..., ::-1])
 
 if __name__ == '__main__':
     args = parser.parse_args()

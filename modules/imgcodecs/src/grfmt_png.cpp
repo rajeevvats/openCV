@@ -1381,7 +1381,7 @@ bool PngEncoder::writeanimation(const Animation& animation, const std::vector<in
     std::vector<APNGFrame> frames;
     std::vector<Mat> tmpframes;
 
-    for (i = 0; i < (int)animation.frames.size(); i++)
+    for (i = 0; i < (uint32_t)animation.frames.size(); i++)
     {
         APNGFrame apngFrame;
         tmpframes.push_back(animation.frames[i].clone());

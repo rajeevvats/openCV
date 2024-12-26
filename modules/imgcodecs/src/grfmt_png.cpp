@@ -1313,6 +1313,8 @@ void PngEncoder::deflate_rect_fin(unsigned char* zbuf, uint32_t* zsize, int bpp,
 bool PngEncoder::writemulti(const std::vector<Mat>& img_vec, const std::vector<int>& params)
 {
     CV_Assert(img_vec[0].depth() == CV_8U);
+    CV_LOG_INFO(NULL, "Multi page image will be written as animation with 1 second frame duration.");
+
     Animation animation;
     animation.frames = img_vec;
 
@@ -1379,7 +1381,7 @@ bool PngEncoder::writeanimation(const Animation& animation, const std::vector<in
     std::vector<APNGFrame> frames;
     std::vector<Mat> tmpframes;
 
-    for (size_t i = 0; i < animation.frames.size(); i++)
+    for (i = 0; i < (int)animation.frames.size(); i++)
     {
         APNGFrame apngFrame;
         tmpframes.push_back(animation.frames[i].clone());
